@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // for navigation
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,6 +19,11 @@ export default function Login() {
 
     const data = await response.text();
     alert(data); // just show response for now
+
+    // Example: redirect to dashboard if login successful
+    if (data === "Login successful") {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -45,6 +52,12 @@ export default function Login() {
           Login
         </button>
       </form>
+      <button
+        onClick={() => navigate("/register")}
+        style={{ marginTop: "10px" }}
+      >
+        Register
+      </button>
     </div>
   );
 }
