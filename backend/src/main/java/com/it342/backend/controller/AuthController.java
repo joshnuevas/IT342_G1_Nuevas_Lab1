@@ -1,11 +1,17 @@
 package com.it342.backend.controller;
 
-import com.it342.backend.model.User;
-import com.it342.backend.repository.UserRepository;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.it342.backend.model.User;
+import com.it342.backend.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -15,7 +21,7 @@ public class AuthController {
     @Autowired
     private UserRepository userRepo;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
     public String register(@RequestBody User user){
