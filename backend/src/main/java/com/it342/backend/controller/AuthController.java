@@ -1,44 +1,33 @@
 package com.it342.backend.controller;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.it342.backend.model.User;
-import com.it342.backend.repository.UserRepository;
+import com.it342.backend.dto.LoginRequest;
+import com.it342.backend.dto.RegisterRequest;
+import com.it342.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepo;
+    private final UserService userService;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepo.save(user);
-        return "User registered successfully";
+    public String register(@RequestBody RegisterRequest request) {
+        return userService.register(request);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user){
-        Optional<User> existing = userRepo.findByEmail(user.getEmail());
-        if(existing.isEmpty()) return "User not found";
-
-        if(passwordEncoder.matches(user.getPassword(), existing.get().getPassword())){
-            return "Login successful";
-        } else {
-            return "Invalid credentials";
-        }
+    public String login(@RequestBody LoginRequest request) {
+        return userService.login(request);
     }
 }
