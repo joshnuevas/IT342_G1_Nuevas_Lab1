@@ -1,5 +1,7 @@
 package com.it342.backend.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +29,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-        return userService.login(request);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+
+        String token = userService.login(request);
+
+        if (token != null) {
+            return ResponseEntity.ok(token);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid credentials");
     }
 }

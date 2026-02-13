@@ -9,17 +9,21 @@ import com.it342.backend.dto.LoginRequest;
 import com.it342.backend.dto.RegisterRequest;
 import com.it342.backend.model.User;
 import com.it342.backend.repository.UserRepository;
+import com.it342.backend.security.JwtUtil;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepo;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public UserService(UserRepository userRepo,
-                       BCryptPasswordEncoder passwordEncoder) {
+                       BCryptPasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public String register(RegisterRequest request) {
@@ -36,17 +40,22 @@ public class UserService {
         user.setAddress(request.address);
 
         userRepo.save(user);
+
         return "User registered successfully";
     }
 
     public String login(LoginRequest request) {
 
         Optional<User> existing = userRepo.findByEmail(request.email);
-        if (existing.isEmpty()) return "User not found";
+
+        if (existing.isEmpty()) {
+            return null;
+        }
 
         if (passwordEncoder.matches(request.password, existing.get().getPassword())) {
-            return "Login successful";
+            return jwtUtil.generateToken(existing.get().getEmail());
         }
-        return "Invalid credentials";
+
+        return null;
     }
 }
