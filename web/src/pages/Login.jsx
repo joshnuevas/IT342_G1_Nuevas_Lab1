@@ -4,31 +4,38 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // for navigation
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:8080/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.text();
-    alert(data); // just show response for now
+      const token = await response.text();
 
-    // Example: redirect to dashboard if login successful
-    if (data === "Login successful") {
-      navigate("/dashboard");
+      if (response.ok) {
+        localStorage.setItem("token", token);
+        navigate("/home");
+      } else {
+        alert("Invalid credentials");
+      }
+
+    } catch {
+      alert("Server error");
     }
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto" }}>
       <h2>Login</h2>
+
       <form onSubmit={handleLogin}>
         <div>
           <label>Email</label>
@@ -39,6 +46,7 @@ export default function Login() {
             required
           />
         </div>
+
         <div style={{ marginTop: "10px" }}>
           <label>Password</label>
           <input
@@ -48,10 +56,12 @@ export default function Login() {
             required
           />
         </div>
+
         <button type="submit" style={{ marginTop: "20px" }}>
           Login
         </button>
       </form>
+
       <button
         onClick={() => navigate("/register")}
         style={{ marginTop: "10px" }}
